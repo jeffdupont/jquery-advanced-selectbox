@@ -174,22 +174,7 @@
     }
 
     binder = options.live ? 'live' : 'bind';
-
-    if ($.fn.hoverIntent) {
-      this.parent()[binder]('mouseenter', function(){
-        if (!this.parent().data('initHoverIntent')) {
-          this.parent().data('initHoverIntent', true);
-          this.parent().hoverIntent({
-            over: enter
-          , timeout: options.delayIn
-          , out: leave
-          });
-          this.parent().trigger('mouseenter');
-        }
-      });
-    } else {
-      this.parent()[binder]('mouseenter', enter)[binder]('mouseleave', leave);
-    }
+    this.parent()[binder]('mouseenter', enter)[binder]('mouseleave', leave);
 
     return this;
   };
