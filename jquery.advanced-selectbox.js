@@ -1,10 +1,25 @@
 /*!
  * jQuery Advanced Selectbox Plugin v0.1
  *
- * Copyright 2012, Jeff Dupont / iAcquire.com
+ * Author: Jeff Dupont
+ * ==========================================================
+ * Copyright 2012 iAcquire, LLC.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ * ==========================================================
  */
 
-;(function($){
+;(function( $ ){
 
  /* PUBLIC CLASS
   * ============ */
@@ -20,7 +35,6 @@
       if (!this.$valuebox) {
         this.$valuebox = $('<div class="advanced-selectbox-values"></div>')
           .css({ display: 'block' })
-          .html("i am the value box");
 
         this.$element.before(this.$valuebox);
       }
@@ -167,7 +181,7 @@
           this.parent().data('initHoverIntent', true);
           this.parent().hoverIntent({
             over: enter
-          , timeout: options.delay
+          , timeout: options.delayIn
           , out: leave
           });
           this.parent().trigger('mouseenter');
@@ -195,4 +209,4 @@
   };
 
 
-})(jQuery);
+})(window.jQuery);
