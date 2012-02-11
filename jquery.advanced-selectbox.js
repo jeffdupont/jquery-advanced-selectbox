@@ -27,6 +27,9 @@
     this.$element = $(element);
     this.options = options;
     this.enabled = true;
+
+    this.width = this.$element.outerWidth();
+    this.height = this.$element.outerHeight();
   };
 
   AdvancedSelectbox.prototype = {
@@ -34,7 +37,7 @@
     valuebox: function() {
       if (!this.$valuebox) {
         this.$valuebox = $('<div class="advanced-selectbox-values"></div>')
-          .css({ display: 'block' })
+          .css({ display: 'block', cursor: 'pointer' })
 
         this.$element.before(this.$valuebox);
       }
@@ -45,9 +48,21 @@
       var $valuebox
 
       $valuebox = this.valuebox();
-      $valuebox.hide();
+      $valuebox
+        .css({ position: 'absolute' })
+        .fadeOut();
 
-      this.$element.show();
+      this.$element
+        .stop(true, true)
+        .css({ 
+          position: 'absolute'
+          , zIndex: 2
+          , width: this.width
+          , height: this.height
+          , boxShadow: "1px 1px 2px rgba(0,0,0,0.3)"
+        })
+        .slideDown();
+
     }
 
   , hide: function() {
@@ -56,9 +71,13 @@
       this.getSelectedValues();
 
       $valuebox = this.valuebox();
-      $valuebox.show();
+      $valuebox
+        .css({ position: 'relative' })
+        .slideDown()
 
-      this.$element.hide();
+      this.$element
+        .stop(true, true)
+        .hide();
     }
 
   , getSelectedValues: function() {
@@ -70,7 +89,8 @@
       $valuebox = this.valuebox();
       $valuebox.empty();
       
-      current_count = $e.find("option:selected").length
+      var selected = $e.find("option"+(o.filter?"[data-advanced-selectbox!='nocount']":"")+":selected")
+      var current_count = selected.length
       if(current_count == 0) {
         $valuebox.append(
           $("<div></div>")
@@ -78,14 +98,14 @@
         );
       }
 
-      $e.find("option:selected").each(function(idx) {
-        if (idx > o.show) return false;
+      selected.each(function(idx) {
+        if (idx > o.show-1) return false;
 
         var selected_text = $(this).text().replace(/^\s*|\s*$/, "");
         if (selected_text == "" && current_count == 1) {
           selected_text = "None";
         }
-        if (idx == o.show && current_count > o.show + 1)
+        if (idx == o.show-1 && current_count > o.show)
           selected_text = "Plus <b>" + (current_count-o.show) + "</b> additional item" + (current_count > 1 ? "s" : "")
 
         var new_value = $("<div></div>")
@@ -117,8 +137,6 @@
   $.fn.advancedselectbox.init = function (options, Constructor, name) {
     var advancedselectbox
       , binder
-      , eventIn
-      , eventOut;
 
     if (options === true) {
       return this.data(name);
@@ -131,6 +149,15 @@
     }
 
     options = $.extend({}, $.fn[name].defaults, options);
+
+    if (options.exclude.length > 0) {
+      this.find("option").each(function() {
+        var $opt = $(this)
+        if ($.inArray($opt.text(), options.exclude) > -1) {
+          $opt.attr("data-advanced-selectbox", "nocount");
+        }
+      })
+    }
 
     function get(el) {
       var advancedselectbox = $.data(el, name);
@@ -181,16 +208,18 @@
 
   $.fn.advancedselectbox.AdvancedSelectbox = AdvancedSelectbox;
 
-  $.fn.advancedselectbox.elementOptions = function(ele, options) {
-    return $.metadata ? $.extend({}, options, $(ele).metadata()) : options
+  $.fn.advancedselectbox.elementOptions = function(el, options) {
+    return $.metadata ? $.extend({}, options, $(el).metadata()) : options
   };
 
   $.fn.advancedselectbox.defaults = {
     animate: true
-  , delayIn: 100
-  , delayOut: 100
+  , delayIn: 300
+  , delayOut: 300
   , live: false
-  , show: 3
+  , show: 4
+  , filter: true
+  , exclude: []
   };
 
 
