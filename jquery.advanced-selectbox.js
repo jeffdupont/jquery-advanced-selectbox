@@ -38,6 +38,10 @@
       if (!this.$valuebox) {
         this.$valuebox = $('<div class="advanced-selectbox-values"></div>')
           .css({ display: 'block', cursor: 'pointer' })
+          .attr('tabindex', '0')
+          .bind('focus', function() {
+            $(this).parent().trigger('mouseenter');
+          })
 
         this.$element.before(this.$valuebox);
       }
@@ -49,20 +53,21 @@
 
       $valuebox = this.valuebox();
       $valuebox
-        .css({ position: 'absolute' })
-        .fadeOut();
+        .animate({ opacity:0 })
+        .removeAttr('tabindex')
 
       this.$element
         .stop(true, true)
-        .css({ 
-          position: 'absolute'
+        .css({
+            position: 'absolute'
           , zIndex: 2
           , width: this.width
           , height: this.height
           , boxShadow: "1px 1px 2px rgba(0,0,0,0.3)"
+          , top: this.$valuebox.position().top
         })
-        .slideDown();
-
+        .slideDown()
+        .focus()
     }
 
   , hide: function() {
@@ -72,8 +77,8 @@
 
       $valuebox = this.valuebox();
       $valuebox
-        .css({ position: 'relative' })
-        .slideDown()
+        .animate({ opacity:1 })
+        .attr('tabindex', '0')
 
       this.$element
         .stop(true, true)
@@ -88,7 +93,7 @@
 
       $valuebox = this.valuebox();
       $valuebox.empty();
-      
+
       var selected = $e.find("option"+(o.filter?"[data-advanced-selectbox!='nocount']":"")+":selected")
       var current_count = selected.length
       if(current_count == 0) {
@@ -173,7 +178,7 @@
     };
 
     function enter() {
-      var advancedselectbox = get($(this).children("select")[0]);
+      var advancedselectbox = get((this.nodeName == "SELECT") ? this : $(this).children("select")[0]);
       advancedselectbox.state = "in";
 
       setTimeout(function() {
@@ -184,7 +189,7 @@
     }
 
     function leave() {
-      var advancedselectbox = get($(this).children("select")[0]);
+      var advancedselectbox = get((this.nodeName == "SELECT") ? this : $(this).children("select")[0]);
       advancedselectbox.state = "out";
 
       setTimeout(function() {
@@ -202,6 +207,9 @@
 
     binder = options.live ? 'live' : 'bind';
     this.parent()[binder]('mouseenter', enter)[binder]('mouseleave', leave);
+    this.bind('blur', function() {
+      $(this).parent().trigger('mouseleave');
+    });
 
     return this;
   };
